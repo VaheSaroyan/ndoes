@@ -1,10 +1,16 @@
-import UserModel from '../../models/UserModel'
-class HomeController {
+import UsersModel from '../../models/UsersModel'
+import PricesModel from "../../models/PricesModel";
 
-    async index({Request:req,Response:res}){
-       const user = await UserModel.where('username','valodik').get()
-        console.log(user);
-        res.send('valodik');
+class HomeController {
+   async index({Request:req,Response:res}){
+
+       const user = await UsersModel.where('id','1').get()
+       console.log(user);
+
+       res.render('index', { title:user?.name, });
+       //  const prices =  PricesModel.all()
+       //  console.log({prices});
+
     }
     secound({Request:req,Response:res}){
 

@@ -1,35 +1,65 @@
-import mysql from "mysql"
+// import mysql from "mysql"
+// import {config} from "dotenv";
+//
+// config({path:__dirname + '/../../.env'})
 
-const con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database:"ewallet"
-});
 
-con.connect(function(err) {
-    if (err) throw err;
-    console.log("Connected!");
-})
+
+
+
 
 
 class Model{
     constructor() {
         this.model = {}
-        this.result = null
+        this.result = {name:'valodik'}
+        this.table = this.constructor.name.replace('Model','').toLowerCase()
+        this.mainQuery = `SELECT * FROM ${this.table} `
+        this.query = ''
     }
 
     where(findElem,value){
-        this.model = {[findElem]:value}
+        console.log(findElem,value)
+        this.query = `WHERE ${findElem} = '${value}'`
+
         return this
     }
-
-    async get(){
-         await con.query("SELECT * FROM users WHERE name = 'Vahe Saoyans'",(err,res) => {
-           if (err) throw err;
-           this.result = res
-       })
+    all(){
+        connection.query(`SELECT * FROM ${this.table}`, (err, res) => {
+            if (err) throw err;
+            this.result = res
+        })
         return this.result
+    }
+    async get(){
+        try {
+            const res = await connection.query(`${this.mainQuery + this.query}`)
+
+            return  res[0]
+        }catch (err){
+            throw err;
+        }finally {
+            // await connection.close();
+        }
+        // return await withTransaction(connection,async () => {
+        //    const res = await connection.query(`${this.mainQuery + this.query}`)
+        //     console.log(res);
+        // })
+
+
+
+    }
+}
+async function withTransaction( db, callback ) {
+    try {
+        await db.beginTransaction();
+        await callback();
+        await db.commit();
+    } catch ( err ) {
+        await db.rollback();
+        throw err;
+    } finally {
+        // await db.close();
     }
 }
 
